@@ -1,34 +1,37 @@
-
-// libraries of the dac
+Beautiful Undying Sounds to Ever Remember
+```
+```
+libraries of the teensy
 ```
 #include <MIDI.h> 
 #include "USBHost_t36.h" 
 #include <SPI.h>
 ```
 
-// usb host setup
+Set up usbhost configuration
 
 ```
 USBHost myusb;
 MIDIDevice buster(myusb);
 
+```
+LED check when synth is plugged in
+```
 const int statusLED = 6;
 ```
-//MOSI pin 11, goes to SDIN
-//SCK pin 13, goes to SCLK on DAC
 
 ```
 const int DAC_CS = 10;  //goes to SYNC on DAC
 float V_semitone = 85.33333;   // 12-bit steps per semitone (resolution/total keys = 4096/48 for 4 octaves)    
 ```
-// note on/off
+Pitch bend variables
 ```
 bool noteHeld = false;
 byte heldNote = 0;
 float bend = 0.0;               // Current pitch bend value (-8192 to +8191)
 int lastDacValue = -1;          // Tracks last sent DAC value to avoid unnecessary writes
 ```
-// constantly recalculates note when pitch bends
+constantly recalculates note when pitch bends
 ```
 int calculate() {
     // Normalize bend to -1.0/+1.0 then scale to ±2 semitones.
@@ -42,8 +45,9 @@ int calculate() {
     return constrain(result, 0, 4095);
 }
 ```
-// send the 16-bit value to the AD5684 DAC over SPI
-```void writeDAC(uint16_t value) {```
+// send the 16-bit value to the AD5684 DAC over SPI 
+```
+  void writeDAC(uint16_t value) {
     // AD5684 is a 24-bit word:
     // Bits 23-20: command (0011 = write and update)
     // Bits 19-16: address (0001 = DAC A)
@@ -59,6 +63,8 @@ int calculate() {
     SPI.transfer(packet & 0xFF);           // Send bottom byte
     digitalWrite(DAC_CS, HIGH);            // End SPI transaction (SYNC high)
 }
+```
+Settings when booting up
 ```
 void setup()
 {
@@ -76,6 +82,7 @@ void setup()
     Serial.println("USB Host MIDI starting...");
     myusb.begin();
     Serial.println("Waiting for USB MIDI device...");
+    
 }
 ```
 ```
